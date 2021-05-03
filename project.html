@@ -2,8 +2,136 @@
 <html>
 <head>
 	<title>Project</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="api.js"></script>
 </head>
 <body>
+	<div class="container">
+		<div>
+			<h2 style="float: left">Projects</h2> 
+			<button class="btn btn-sm btn-primary" id="logout" style="float: right">logout</button>
+		</div>
+		<br> <br>
+		<button class="btn btn-sm btn-success" data-toggle="modal" data-target="#myModal">Add project</button>
+	    
+	    <br> <br> 
+	    <span id="success"></span>
 
+	    <br> <br>
+	  <table class="table table-hover" id="project-data">
+	    <thead>
+	      <tr>
+	        <th>Name</th>
+	        <th>Description</th>
+	        <th>Location</th>
+	        <th>Cost</th>
+	        <th>User</th>
+	        <th>Date Created</th>
+	      </tr>
+	    </thead>
+	    <tbody ></tbody>
+	  </table>
+
+		<!-- The Modal -->
+		  <div class="modal fade" id="myModal">
+		    <div class="modal-dialog modal-dialog-centered">
+		      <div class="modal-content">
+		      
+		        <!-- Modal Header -->
+		        <div class="modal-header">
+		          <h4 class="modal-title">New Project</h4>
+		          <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        </div>
+		        
+		        <!-- Modal body -->
+		        <div class="modal-body">
+		          <form action="api.js">
+				    <div class="form-group">
+				      <label for="name">Name:</label>
+				      <input type="text" class="form-control" id="name" placeholder="Enter Project Name" name="name">
+				    </div>
+				    <div class="form-group">
+				      <label for="desc">Description</label>
+				      <input type="text" class="form-control" id="desc" placeholder="Enter Description" name="desc">
+				    </div>
+				    <div class="form-group">
+				      <label for="loc">Location</label>
+				      <input type="text" class="form-control" id="loc" placeholder="Enter Location" name="loc">
+				    </div>
+				    <div class="form-group">
+				      <label for="cost">Cost</label>
+				      <input type="number" class="form-control" id="cost" placeholder="Enter cost" name="cost">
+				    </div>
+				    <!-- Modal footer -->
+				        <div class="modal-footer">
+				        	<button type="button" class="btn btn-success" id="add" >Save</button>
+				          	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				        </div>
+				  </form>
+		        </div>
+		        
+		        
+		        
+		      </div>
+		    </div>
+		  </div>
+	</div>
+<div id="xyz"></div>
+<script type="text/javascript">
+	$(function(){
+
+		getProjects();
+
+		function getProjects(){
+
+			if( sessionStorage.getItem("access_token") != '' ){
+
+				$.ajax({
+					async: true,
+					crossDomain: true,
+					dataType: "json",
+			        url: "http://localhost:8000/api/projects",
+			        method: 'get',
+			        headers: {
+				        "Content-Type": "application/x-www-form-urlencoded",
+				        "Authorization": "Bearer "+sessionStorage.getItem("access_token"),
+				    },
+			        success: function(result){
+
+						var myProjects = [];
+
+	                    for (var i = 0; i<result['projects'].length; i++) {
+	                    	myProjects.push(result['projects'][i]); 
+	                    }
+
+	                    var tbody = $('#project-data tbody');
+
+	                    $.each(myProjects, function() {
+	                    	var tr = $('<tr>');
+
+	                    	$.each(this, function(i, prop) {
+	                    		$('<td>').html(prop).appendTo(tr);
+	                    	});	
+							tbody.append(tr);
+	                    });
+	                    // console.log(myProjects);
+			        },
+			        error: function(error){
+			        	$('#error').text('Something went wrong. Please try again!');
+			        	$('#error').css('color','red');
+			        }
+		    	});
+			}
+		}
+
+
+		
+	});
+</script>
 </body>
 </html>
